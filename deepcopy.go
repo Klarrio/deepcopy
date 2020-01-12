@@ -21,25 +21,26 @@ func Iface(iface interface{}) interface{} {
 	return Copy(iface)
 }
 
-// CopyPtr creates a deep copy of whatever is passed to it and returns the copy
-// in an interface{} pointer.  The returned value will need to be asserted to the
+// CopyValue creates a deep copy of whatever is passed to it and returns the copy
+// in an reflect.Value pointer.  The returned value will need to be asserted to the
 // correct type.
-func CopyPtr(src interface{}) interface{} {
+// - output.Elem().Interface() will return the value interface
+// - output.Interface() will return the pointer value interface
+func CopyValue(src interface{}) reflect.Value {
 	if src == nil {
-		return nil
+		return reflect.Value{}
 	}
-
 	// Make the interface a reflect.Value
 	original := reflect.ValueOf(src)
 
 	// Make a copy of the same type as the original.
-	cpy := reflect.New(original.Type())
+	output := reflect.New(original.Type())
 
 	// Recursively copy the original.
-	copyRecursive(original, cpy.Elem())
+	copyRecursive(original, output.Elem())
 
 	// Return the copy as an interface.
-	return cpy.Interface()
+	return output
 }
 
 // Copy creates a deep copy of whatever is passed to it and returns the copy
